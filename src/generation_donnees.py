@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-#1. paramètres généraux
+### 1. paramètres généraux
 
 N_ÉTUDIANTS = 75
 RAND_SEED = 2026
@@ -22,21 +22,21 @@ CHEMIN_CSV = DOSSIER_DONNEES / "donnees_ia.csv" #définition du chemin pour la c
 
 DOSSIER_DONNEES.mkdir(parents=True, exist_ok=True) #redondance utile pour éviter des problèmes
 
-#2. Initialisation du générateur aléatoire
+### 2. Initialisation du générateur aléatoire
 
 rng = np.random.default_rng(RAND_SEED) #création du générateur de nombres aléatoire NumPy, pour que le programme produise les mêmes données chaque fois qu'il est exécuté
 
-#3. Création des identifiants
+### 3. Création des identifiants
 
 ids = np.arange(1, N_ÉTUDIANTS + 1)
 
-#4. Création initiale de la base de données fictive
+### 4. Création initiale de la base de données fictive
 
 donnees = pd.DataFrame({
     "id" : ids
 })
 
-#5. Visualisation de la base
+### 5. Visualisation de la base
 
 print("Cinq premières lignes: ")
 print(donnees.head())
@@ -47,3 +47,43 @@ print(donnees.tail())
 print("\nDimensions de la base: ")
 print(donnees.shape)
 
+### 6. Vérifs initiales
+
+#on vérifie qu'on a bien créé 75 identifiants
+assert len(donnees) == N_ÉTUDIANTS
+#on vérifie qu'il n'y a pas de doublons
+assert donnees["id"].is_unique
+#on vérifie ensuite que la premier et le dernier identifiants valent respectivement 1 et 75
+assert donnees["id"].min() == 1
+assert donnees["id"].max() == N_ÉTUDIANTS 
+
+#si tout va bien, la ligne suivante s'exécute:
+print("\nToutes les vérifications initiales ont réussi.")
+
+### 7. Ajout de la variable "session" à la base
+
+choix_session = ["1re", "2e", "3e", "4e", "5e ou plus"]
+prob_session = [0.225, 0.225, 0.225, 0.225, 0.10]
+
+#petites vérifications des paramètres
+assert np.isclose(sum(prob_session), 1.00) 
+assert len(choix_session) == len(prob_session)
+assert all(0 <= probabilite <= 1 for probabilite in prob_session)
+
+#création des sessions pour les étudiants
+sessions = rng.choice(
+a=choix_session,
+size=N_ÉTUDIANTS,
+replace=True,
+p=prob_session
+)
+
+#ajout à la base de données fictive
+donnees["session"] = sessions
+
+#petites vérifications des sessions
+print(donnees.head())
+print(donnees["session"].value_counts().sort_index())
+assert donnees["session"].isin(choix_session).all()
+assert len(donnees["session"]) == N_ÉTUDIANTS
+print("\nVérification des sessions ok.")
