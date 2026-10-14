@@ -236,20 +236,69 @@ print(
     ].head(10)
 )
 
-print("\nStatistiques des durées chez les utilisateurs :")
-print(
-    donnees.loc[
-        condition_utilisateur,
-        "duree_minutes"
-    ].describe()
+###10. Ajout de la variable usage_principal
+
+#initialisation du tableau:
+tableau_usages_principaux = np.full(
+    N_ÉTUDIANTS,
+    "Aucun usage",
+    dtype=object #permet de stocker des chaînes des longueurs différentes
 )
+
+#définition des paramètres
+usages_possibles = [
+    "Comprendre une notion",
+    "Résoudre un problème ou un exercice",
+    "Résumer",
+    "Rédiger ou reformuler",
+    "Préparer un examen",
+    "Écrire ou comprendre du code",
+    "Autre"
+]
+
+probabilites_usages_possibles = [0.24, 0.22, 0.12, 0.16, 0.11, 0.10, 0.05]
+
+#vérifications des paramètres
+assert np.isclose(sum(probabilites_usages_possibles), 1.0)
+assert len(usages_possibles) == len(probabilites_usages_possibles)
+assert all(0 <= p <= 1 for p in probabilites_usages_possibles)
+
+#on génère les usages des utilisateurs
+usages_generes = rng.choice(
+    a=usages_possibles,
+    size=nb_utilisateurs,
+    replace=True,
+    p=probabilites_usages_possibles
+)
+
+#on insère les usages dans le tableau des usages
+tableau_usages_principaux[condition_utilisateur] = usages_generes
+
+#ajout à la base
+donnees["usage_principal"] = tableau_usages_principaux
+
+#vérifications des usages principaux
+assert len(usages_generes) == nb_utilisateurs
+assert len(donnees["usage_principal"]) == N_ÉTUDIANTS
+assert donnees["usage_principal"].notna().all()
+
+assert donnees.loc[
+    condition_utilisateur,
+    "usage_principal"
+].isin(usages_possibles).all()
+
+assert donnees.loc[
+    condition_non_utilisateur,
+    "usage_principal"
+].eq("Aucun usage").all()
+
+#inspection visuelle
 print(
-    donnees.loc[
-        donnees["duree_minutes"].idxmax(),
+        donnees[
         [
-            "jours_utilisation",
             "utilisation_recente",
-            "duree_minutes"
+            "usage_principal"
         ]
-    ]
+    ].head(10)
 )
+print(donnees["usage_principal"].value_counts())
