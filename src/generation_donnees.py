@@ -152,3 +152,104 @@ print(donnees[
 print(donnees["utilisation_recente"].value_counts())
 
 print("Vérifications croisées ok.")
+
+### 9. Ajout de la variable duree_minutes
+
+#il faut d'abord s'assurer que les non-utilisateurs ne sont pas considérés par l'algorithme
+nb_utilisateurs = condition_utilisateur.sum()
+
+#création d'un tableau initial pour les durées
+tableau_durees_minutes = np.zeros(N_ÉTUDIANTS, dtype=int)
+
+#on va utiliser une distribution gamma pour obtenir des durées quotidiennes qui
+#sont concentrées autour de des petites ou moyennes valeurs, mais présentant
+#quelques valeurs plus élevées. La distribution gamma est aussi utile puisqu'elle 
+#ne génère pas de valeurs négatives. Nous n'avons pas de données réelles qui démontrent
+#que la durée d'utilisation de l'IA suit une loi Gamma; nous posons seulement une
+#hypothèse plausible.
+durees_quoti_utilisateurs = rng.gamma(
+    shape=3,
+    scale=15,
+    size=nb_utilisateurs
+)
+
+#préparation de la série contenant les jours d'utilisation des utilisateurs de l'IA
+jours_des_utilisateurs = donnees.loc[
+    condition_utilisateur,
+    "jours_utilisation"
+]
+#on vérifie qu'on a bel et bien sélectionné seulement les valeurs plus grandes que zéro
+assert len(jours_des_utilisateurs) == nb_utilisateurs
+assert (jours_des_utilisateurs > 0).all()
+
+#on calcule enfin les durées hebdomadaires des utilisateurs
+durees_hebdomadaires = np.rint(
+    jours_des_utilisateurs.to_numpy() * durees_quoti_utilisateurs
+).astype(int)
+
+durees_hebdomadaires = np.clip(
+    durees_hebdomadaires,
+    a_min=1,
+    a_max=None
+)
+
+#on insère les valeurs générées
+tableau_durees_minutes[condition_utilisateur] = durees_hebdomadaires
+
+#on ajoute à la base
+donnees["duree_minutes"] = tableau_durees_minutes
+
+#vérifications nécessaires
+assert len(donnees["duree_minutes"]) == N_ÉTUDIANTS
+assert donnees["duree_minutes"].notna().all()
+assert (donnees["duree_minutes"] >= 0).all()
+assert pd.api.types.is_integer_dtype(
+    donnees["duree_minutes"]
+)
+
+
+#On vérifie que, parmi les lignes où le nombre de jours est supérieur à zéro,
+#la durée hebdomadaire est strictement supérieure à zéro:
+assert (
+    donnees.loc[
+        condition_utilisateur,
+        "duree_minutes"
+    ] > 0
+).all()
+
+#on vérifie ensuite le cas inverse:
+assert (
+    donnees.loc[
+        condition_non_utilisateur,
+        "duree_minutes"
+    ] == 0
+).all()
+
+#inspection visuelle
+print(
+        donnees[
+        [
+            "jours_utilisation",
+            "utilisation_recente",
+            "duree_minutes"
+        ]
+    ].head(10)
+)
+
+print("\nStatistiques des durées chez les utilisateurs :")
+print(
+    donnees.loc[
+        condition_utilisateur,
+        "duree_minutes"
+    ].describe()
+)
+print(
+    donnees.loc[
+        donnees["duree_minutes"].idxmax(),
+        [
+            "jours_utilisation",
+            "utilisation_recente",
+            "duree_minutes"
+        ]
+    ]
+)
