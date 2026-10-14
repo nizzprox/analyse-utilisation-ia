@@ -72,10 +72,10 @@ assert all(0 <= probabilite <= 1 for probabilite in prob_session)
 
 #création des sessions pour les étudiants
 sessions = rng.choice(
-a=choix_session,
-size=N_ÉTUDIANTS,
-replace=True,
-p=prob_session
+    a=choix_session,
+    size=N_ÉTUDIANTS,
+    replace=True,
+    p=prob_session
 )
 
 #ajout à la base de données fictive
@@ -87,3 +87,68 @@ print(donnees["session"].value_counts().sort_index())
 assert donnees["session"].isin(choix_session).all()
 assert len(donnees["session"]) == N_ÉTUDIANTS
 print("\nVérification des sessions ok.")
+
+### 8. Ajout des variables jours_utilisation et utilisation_recente
+
+nb_jours_possibles = np.arange(0, 8)
+prob_nb_jours = [0.12, 0.12, 0.16, 0.20, 0.16, 0.12, 0.07, 0.05]
+
+#petites vérifications des paramètres
+assert np.isclose(sum(prob_nb_jours), 1.00) 
+assert len(nb_jours_possibles) == len(prob_nb_jours)
+assert all(0 <= probabilite <= 1 for probabilite in prob_nb_jours)
+
+#création du nombre de jours où l'IA a été utilisée pour les étudiants
+nb_jours_utilisation = rng.choice(
+    a=nb_jours_possibles,
+    size=N_ÉTUDIANTS,
+    replace=True,
+    p=prob_nb_jours
+)
+
+#ajout à la base
+donnees["jours_utilisation"] = nb_jours_utilisation
+
+#petites vérifications des nombres de jours d'utilisation
+print(donnees.head())
+print(donnees["jours_utilisation"].value_counts().sort_index())
+assert donnees["jours_utilisation"].isin(nb_jours_possibles).all()
+assert len(donnees["jours_utilisation"]) == N_ÉTUDIANTS
+assert donnees["jours_utilisation"].between(0, 7).all()
+print("\nVérification des jours d'utilisation ok.")
+
+#déduction de l'utilisation récente de l'IA selon le nombre de jours d'utilisation
+utilisation_recente = np.where(nb_jours_utilisation > 0, "Oui", "Non")
+
+#ajout à la base
+donnees["utilisation_recente"] = utilisation_recente
+
+#Vérifications croisées de utilisation_recente avec jours_utilisation
+condition_utilisateur = donnees["jours_utilisation"] > 0
+condition_non_utilisateur = donnees["jours_utilisation"] == 0
+
+#On vérifie d'abord si, parmi les lignes où le nombre de jours est supérieur à zéro,
+#toutes les valeurs d'utilisation récente sont égales à "Oui"
+assert donnees.loc[
+    condition_utilisateur,
+    "utilisation_recente"
+].eq("Oui").all()
+
+#On vérifie le cas inverse
+assert donnees.loc[
+    condition_non_utilisateur,
+    "utilisation_recente"
+].eq("Non").all() 
+
+#Finalement, on vérifie qu'il ne manque pas de données
+assert donnees["jours_utilisation"].notna().all()
+assert donnees["utilisation_recente"].notna().all()
+assert donnees["utilisation_recente"].isin(["Oui", "Non"]).all()
+
+print(donnees[
+    ["jours_utilisation", "utilisation_recente"]
+].head(10))
+
+print(donnees["utilisation_recente"].value_counts())
+
+print("Vérifications croisées ok.")
