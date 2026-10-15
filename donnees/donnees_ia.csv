@@ -1,0 +1,76 @@
+﻿id,session,jours_utilisation,utilisation_recente,duree_minutes,usage_principal,outil_principal,verification,utilite_percue
+1,1re,4,Oui,182,Préparer un examen,ChatGPT,Parfois,Peu utile
+2,3e,1,Oui,91,Résoudre un problème ou un exercice,Perplexity,Jamais,Très utile
+3,3e,6,Oui,331,Résoudre un problème ou un exercice,ChatGPT,Parfois,Pas du tout utile
+4,2e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+5,2e,2,Oui,90,Écrire ou comprendre du code,Gemini,Parfois,Assez utile
+6,4e,2,Oui,69,Résoudre un problème ou un exercice,ChatGPT,Souvent,Très utile
+7,5e ou plus,4,Oui,90,Préparer un examen,Copilot,Rarement,Peu utile
+8,1re,3,Oui,43,Résumer,Perplexity,Rarement,Assez utile
+9,3e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+10,2e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+11,5e ou plus,4,Oui,25,Comprendre une notion,ChatGPT,Rarement,Assez utile
+12,5e ou plus,3,Oui,183,Comprendre une notion,Claude,Jamais,Assez utile
+13,3e,4,Oui,650,Résumer,Claude,Toujours,Assez utile
+14,4e,3,Oui,63,Rédiger ou reformuler,DeepSeek,Souvent,Très utile
+15,3e,6,Oui,129,Préparer un examen,ChatGPT,Parfois,Très utile
+16,4e,6,Oui,367,Résoudre un problème ou un exercice,Claude,Jamais,Assez utile
+17,2e,1,Oui,85,Comprendre une notion,ChatGPT,Jamais,Moyennement utile
+18,2e,6,Oui,334,Résumer,Autre,Toujours,Peu utile
+19,2e,5,Oui,406,Comprendre une notion,ChatGPT,Jamais,Moyennement utile
+20,2e,4,Oui,122,Résoudre un problème ou un exercice,ChatGPT,Jamais,Très utile
+21,3e,4,Oui,432,Résumer,ChatGPT,Souvent,Moyennement utile
+22,2e,3,Oui,173,Résoudre un problème ou un exercice,Claude,Rarement,Très utile
+23,3e,6,Oui,148,Résoudre un problème ou un exercice,Gemini,Parfois,Moyennement utile
+24,1re,1,Oui,74,Comprendre une notion,Autre,Parfois,Peu utile
+25,2e,3,Oui,106,Comprendre une notion,ChatGPT,Souvent,Moyennement utile
+26,2e,5,Oui,256,Préparer un examen,Claude,Parfois,Moyennement utile
+27,1re,1,Oui,32,Résumer,ChatGPT,Souvent,Peu utile
+28,3e,4,Oui,221,Écrire ou comprendre du code,ChatGPT,Parfois,Assez utile
+29,2e,3,Oui,95,Écrire ou comprendre du code,Perplexity,Rarement,Très utile
+30,2e,5,Oui,234,Comprendre une notion,ChatGPT,Jamais,Assez utile
+31,1re,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+32,4e,4,Oui,54,Résoudre un problème ou un exercice,Copilot,Souvent,Assez utile
+33,4e,5,Oui,249,Résumer,Gemini,Rarement,Très utile
+34,3e,4,Oui,174,Comprendre une notion,ChatGPT,Parfois,Moyennement utile
+35,2e,2,Oui,102,Comprendre une notion,ChatGPT,Parfois,Assez utile
+36,5e ou plus,4,Oui,184,Préparer un examen,ChatGPT,Toujours,Très utile
+37,3e,2,Oui,93,Préparer un examen,ChatGPT,Jamais,Assez utile
+38,2e,4,Oui,115,Résoudre un problème ou un exercice,DeepSeek,Rarement,Assez utile
+39,5e ou plus,1,Oui,58,Rédiger ou reformuler,Copilot,Souvent,Assez utile
+40,2e,2,Oui,59,Résumer,ChatGPT,Rarement,Peu utile
+41,4e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+42,2e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+43,2e,3,Oui,195,Préparer un examen,Claude,Jamais,Assez utile
+44,4e,1,Oui,42,Résoudre un problème ou un exercice,ChatGPT,Souvent,Très utile
+45,2e,3,Oui,78,Résumer,Copilot,Souvent,Très utile
+46,3e,4,Oui,51,Écrire ou comprendre du code,ChatGPT,Rarement,Assez utile
+47,3e,6,Oui,78,Préparer un examen,Perplexity,Jamais,Moyennement utile
+48,1re,2,Oui,56,Résoudre un problème ou un exercice,Perplexity,Souvent,Assez utile
+49,4e,2,Oui,100,Écrire ou comprendre du code,ChatGPT,Parfois,Très utile
+50,3e,2,Oui,49,Résoudre un problème ou un exercice,Claude,Toujours,Très utile
+51,3e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+52,2e,4,Oui,73,Rédiger ou reformuler,Perplexity,Parfois,Moyennement utile
+53,2e,5,Oui,175,Rédiger ou reformuler,Perplexity,Rarement,Très utile
+54,3e,3,Oui,272,Résoudre un problème ou un exercice,ChatGPT,Jamais,Assez utile
+55,3e,3,Oui,177,Préparer un examen,ChatGPT,Parfois,Très utile
+56,4e,7,Oui,370,Résumer,ChatGPT,Souvent,Moyennement utile
+57,3e,4,Oui,560,Autre,ChatGPT,Jamais,Très utile
+58,2e,4,Oui,233,Écrire ou comprendre du code,ChatGPT,Parfois,Assez utile
+59,1re,6,Oui,110,Écrire ou comprendre du code,Perplexity,Parfois,Moyennement utile
+60,4e,1,Oui,38,Écrire ou comprendre du code,ChatGPT,Souvent,Assez utile
+61,3e,4,Oui,148,Comprendre une notion,Claude,Jamais,Peu utile
+62,2e,4,Oui,270,Rédiger ou reformuler,ChatGPT,Souvent,Assez utile
+63,3e,5,Oui,169,Préparer un examen,Claude,Rarement,Assez utile
+64,1re,2,Oui,89,Résumer,ChatGPT,Souvent,Assez utile
+65,5e ou plus,4,Oui,329,Résumer,Claude,Souvent,Très utile
+66,5e ou plus,4,Oui,56,Comprendre une notion,DeepSeek,Souvent,Assez utile
+67,1re,3,Oui,31,Comprendre une notion,Perplexity,Rarement,Peu utile
+68,2e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+69,4e,2,Oui,117,Préparer un examen,ChatGPT,Souvent,Assez utile
+70,2e,7,Oui,178,Comprendre une notion,ChatGPT,Rarement,Assez utile
+71,3e,1,Oui,16,Rédiger ou reformuler,Claude,Parfois,Moyennement utile
+72,2e,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+73,4e,2,Oui,82,Comprendre une notion,Copilot,Jamais,Moyennement utile
+74,5e ou plus,0,Non,0,Aucun usage,Aucun outil,Je n'utilise pas l'IA,Je n'utilise pas l'IA
+75,4e,2,Oui,180,Résoudre un problème ou un exercice,ChatGPT,Parfois,Assez utile

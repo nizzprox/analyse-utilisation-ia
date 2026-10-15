@@ -489,3 +489,59 @@ print(
     ].head(10)
 )
 print(donnees["utilite_percue"].value_counts())
+
+### 14. Validation globale de la base
+
+assert donnees.shape[0] == N_ÉTUDIANTS  # Nombre attendu d'observations
+assert donnees["id"].is_unique          # unicité des identifiants
+assert donnees.columns.is_unique        # unicité des noms de colonne
+assert not donnees.isna().any().any()   # on vérifie qu'il ne manque aucune valeur
+
+assert (
+    donnees.loc[
+        condition_non_utilisateur,
+        "jours_utilisation"
+    ] == 0
+).all()
+
+assert (
+    donnees.loc[
+        condition_non_utilisateur,
+        "duree_minutes"
+    ] == 0
+).all()
+
+print("Toutes les validations ont réussi.")
+
+#Inspection visuelle globale de la base
+print("\nAperçu final :")
+print(donnees.head())
+
+print("\nDimensions :", donnees.shape)
+
+print("\nTypes des colonnes :")
+print(donnees.dtypes)
+
+print("\nValeurs manquantes :")
+print(donnees.isna().sum())
+
+print("\nNombre d'utilisateurs :", nb_utilisateurs)
+print("Nombre de non-utilisateurs :", N_ÉTUDIANTS - nb_utilisateurs)
+
+### 15. Exportation de la base au format CSV
+
+donnees.to_csv(
+    CHEMIN_CSV,
+    index=False,
+    encoding="utf-8-sig", #facilite l'ouverture dans Excel
+)
+
+#vérification de l'exportation
+assert CHEMIN_CSV.exists()
+
+donnees_rechargees = pd.read_csv(CHEMIN_CSV)
+
+assert donnees.shape == donnees_rechargees.shape
+assert list(donnees.columns) == list(donnees_rechargees.columns)
+
+print(f"\nBase exportée vers : {CHEMIN_CSV}")
