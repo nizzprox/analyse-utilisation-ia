@@ -454,3 +454,176 @@ for variable, (tableau, base) in tableaux_quantitatifs.items():
     assert modalites["Effectif"].sum() == len(base), (
         f"Erreur dans le tableau : {variable}"
     )
+
+### 8. Indicateurs statistiques des variables quantitatives
+
+### 8.1. Indicateurs du nombre de jours d'utilisation
+
+# On extrait la série quantitative non groupée.
+donnees_jours = donnees_utilisateurs["jours_utilisation"]
+
+# Nombre d'observations:
+nb_jours = donnees_jours.count()
+
+# Indicateurs de tendance centrale:
+moyenne_jours = donnees_jours.mean()
+mediane_jours = donnees_jours.median()
+modes_jours = donnees_jours.mode().to_list()    # .to_list() au cas où il y aurait plusieurs modes.
+
+# Indicateurs de dispersion:
+minimum_jours = donnees_jours.min() 
+maximum_jours = donnees_jours.max()
+etendue_jours = maximum_jours - minimum_jours
+
+# Écart-type:
+ecart_type_jours = donnees_jours.std(ddof=0)
+
+# Coefficient de variation (pourcentage):
+coeff_variation_jours = (ecart_type_jours / moyenne_jours) * 100
+
+# On regroupe les indicateurs dans une seule série pandas:
+indicateurs_jours = pd.Series({
+    "Effectif": nb_jours,
+    "Moyenne": moyenne_jours.round,
+    "Médiane": mediane_jours,
+    "Mode(s)": ", ".join(map(str, modes_jours)),
+    "Minimum": minimum_jours,
+    "Maximum": maximum_jours,
+    "Étendue": etendue_jours,
+    "Écart-type": ecart_type_jours,
+    "Coefficient de variation (%)": coeff_variation_jours
+})
+
+print("\nIndicateurs statistiques du nombre de jours d'utilisation:")
+print(indicateurs_jours)
+
+### 8.2. Indicateurs de la durée d'utilisation
+
+tableau_classes_duree = tableau_duree_utilisation.drop(index="Total")
+
+effectifs_duree = tableau_classes_duree["Effectif"].to_numpy()
+
+bornes_inferieures = np.array([16, 96, 176, 256, 336, 416, 496, 576])
+
+bornes_superieures = np.array([96, 176, 256, 336, 416, 496, 576, 656])
+
+centres_classes = (bornes_inferieures + bornes_superieures) / 2
+
+# Moyenne estimée:
+nb_total_durees = effectifs_duree.sum()
+
+moyenne_groupee_duree = (
+    effectifs_duree * centres_classes
+).sum() / nb_total_durees # (n_i * c_i) / N
+
+# Médiane estimée:
+# On trouve la classe médiane:
+position_mediane = np.searchsorted(
+    np.cumsum(effectifs_duree), 
+    nb_total_durees / 2
+)
+
+# On détermine la borne inférieure et le nombre d'effectifs de la classe médiane:
+borne_inf_mediane = bornes_duree[position_mediane]
+n_classe_mediane = effectifs_duree[position_mediane]
+
+if position_mediane == 0:   # Si la classe médiane est à l'index zéro,
+    n_cumule_precedant = 0  # l'effectif cumulé de la classe précédente
+                            # est de zéro lui aussi.
+else:
+    n_cumule_precedant = np.cumsum( # On calcule l'effectif cumulé de la
+        effectifs_duree             # classe précédant la classe médiane.
+    )[position_mediane - 1]
+
+h_mediane_duree = ( # Calcul de l'amplitude de la classe médiane
+    bornes_duree[position_mediane + 1]
+    - bornes_duree[position_mediane]
+)
+
+mediane_duree = (   # On peut enfin estimer la médiane
+    borne_inf_mediane +
+    h_mediane_duree
+    * (
+        (nb_total_durees / 2 - n_cumule_precedant)
+        / n_classe_mediane
+    )
+)
+
+# Mode estimé:
+position_mode = np.argmax(effectifs_duree) # On trouve l'index de la classe modale
+
+borne_inf_mode = bornes_duree[position_mode]        # Amplitude de la classe modale
+n_classe_modale = effectifs_duree[position_mode]    # Effectif de la classe modale
+
+n_precedent = ( # Effectif de la classe précédant la classe modale
+    effectifs_duree[position_mode - 1]
+    if position_mode > 0
+    else 0
+)
+
+n_suivant = (   # Effectif de la classe suivant la classe modale
+    effectifs_duree[position_mode + 1]
+    if position_mode < len(effectifs_duree) - 1
+    else 0
+)
+
+h_mode = (
+    bornes_duree[position_mode + 1]
+    - bornes_duree[position_mode]
+)
+
+mode_duree = (
+    borne_inf_mode
+    + h_mode
+    * (
+        (n_classe_modale - n_precedent)
+        / (
+            (n_classe_modale - n_precedent)
+            + (n_classe_modale - n_suivant)
+        )
+    )
+)
+
+# On a déjà calculé l'étendue à la ligne 385
+
+# Variance estimée avec les centres et effectifs de classes:
+variance_duree = (
+    effectifs_duree
+    * (centres_classes - moyenne_groupee_duree) ** 2
+).sum() / nb_total_durees
+
+# Écart-type estimé:
+ecart_type_duree = np.sqrt(variance_duree)
+
+# Coefficient de variation estimé:
+coeff_variation_duree = (
+    ecart_type_duree / moyenne_groupee_duree * 100
+)
+
+# On regroupe les indicateurs en série pandas:
+indicateurs_duree = pd.Series({
+    "Effectif": nb_total_durees,
+    "Moyenne estimée": moyenne_groupee_duree,
+    "Médiane estimée": mediane_duree,
+    "Mode estimé": mode_duree,
+    "Minimum": duree_min,
+    "Maximum": duree_max,
+    "Étendue": etendue_duree,
+    "Variance estimée": variance_duree,
+    "Écart-type estimé": ecart_type_duree,
+    "Coefficient de variation estimé (%)": coeff_variation_duree
+})
+
+# Vérifications 
+assert nb_total_durees == len(donnees_utilisateurs)
+
+assert 16 <= moyenne_groupee_duree < 656
+assert 16 <= mediane_duree < 656
+assert 16 <= mode_duree < 96
+
+assert variance_duree >= 0
+assert ecart_type_duree >= 0
+assert coeff_variation_duree >= 0
+
+print("\nIndicateurs statistiques de la durée d'utilisation:")
+print(indicateurs_duree)
