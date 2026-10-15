@@ -130,15 +130,28 @@ assert donnees["session"].notna().all()
 assert donnees["verification"].notna().all()
 assert donnees["utilite_percue"].notna().all()
 
+# Ensemble de l'échantillon.
+donnees_completes = donnees.copy()
+
+# Étudiants ayant utilisé l'IA récemment.
+donnees_utilisateurs = donnees.loc[
+    donnees["utilisation_recente"] == "Oui"
+].copy()
+
+print("Nombre total d'étudiants:", len(donnees_completes))
+print("Nombre d'utilisateurs récents:", len(donnees_utilisateurs))
+
 ### 6. Tableaux de fréquences des variables qualitatives
 
 # on procède par la création d'une fonction, par respect de la norme DRY (Don't repeat yourself)
-def creer_tableau_frequences(variable, cumulatif=False):
+def creer_tableau_frequences(base, variable, cumulatif=False):
     """
     Construit un tableau de fréquences pour une variable qualitative
 
     Paramètres
     ----------
+    base: object
+        Indique quelle base de données utiliser.
     variable: str
         Nom de la colonne de la base à analyser.
     cumulatif: bool
@@ -151,7 +164,7 @@ def creer_tableau_frequences(variable, cumulatif=False):
         Tableau contenant les effectifs et les fréquences
     """
 
-    serie = donnees[variable]
+    serie = base[variable]
 
     # On veut respecter l'ordre défini pour les variables catégorielles.
     if isinstance(serie.dtype, pd.CategoricalDtype):
@@ -207,35 +220,47 @@ def creer_tableau_frequences(variable, cumulatif=False):
 
     return tableau
 
-# Variables ordinales: les fréquences cumulées sont pertinentes.
+
+# Tableaux portant sur l'ensemble de l'échantillon:
+
 tableau_session = creer_tableau_frequences(
+    donnees_completes,
     "session",
-    cumulatif=True
+    cumulatif=True  # Il s'agit d'une variable ordinale: les fréquences cumulés sont pertinentes.
 )
 
+# Nominale, fréquences cumulatives non pertinentes.
+tableau_utilisation = creer_tableau_frequences(donnees_completes, "utilisation_recente")  
+
+
+#Tableaux portant uniquement sur les utilisateurs récents:
+
+# Variables ordinales: les fréquences cumulées sont pertinentes.
 tableau_verification = creer_tableau_frequences(
+    donnees_utilisateurs,
     "verification",
     cumulatif=True
 )
 
 tableau_utilite = creer_tableau_frequences(
+    donnees_utilisateurs,
     "utilite_percue",
     cumulatif=True
 )
 
 # Variables nominales: les fréquences cumulées ne sont pas pertinentes.
-tableau_utilisation = creer_tableau_frequences("utilisation_recente")
-tableau_usage = creer_tableau_frequences("usage_principal")
-tableau_outil = creer_tableau_frequences("outil_principal")
+
+tableau_usage = creer_tableau_frequences(donnees_utilisateurs, "usage_principal")
+tableau_outil = creer_tableau_frequences(donnees_utilisateurs, "outil_principal")
 
 # Affichage des résultats:
 tableaux_qualitatifs = {
-    "session": tableau_session,
-    "utilisation_recente": tableau_utilisation,
-    "usage_principal": tableau_usage,
-    "outil_principal": tableau_outil,
-    "verification": tableau_verification,
-    "utilite_percue": tableau_utilite
+    "session": (tableau_session, donnees_completes),
+    "utilisation_recente": (tableau_utilisation, donnees_completes), 
+    "usage_principal": (tableau_usage, donnees_utilisateurs),
+    "outil_principal": (tableau_outil, donnees_utilisateurs),
+    "verification": (tableau_verification, donnees_utilisateurs),
+    "utilite_percue": (tableau_utilite, donnees_utilisateurs)
 }
 
 titres_tableaux_qualitatifs = {
@@ -249,26 +274,29 @@ titres_tableaux_qualitatifs = {
     ),
     "usage_principal": (
         "Répartition des étudiants inscrits en Sciences de la nature "
-        "selon leur usage principal de l'intelligence artificielle"
+        "ayant utilisé récemment l'intelligence artificielle selon "
+        "leur usage principal de l'intelligence artificielle"
     ),
     "outil_principal": (
         "Répartition des étudiants inscrits en Sciences de la nature "
-        "selon l'outil d'intelligence artificielle principalement "
-        "utilisé"
+        "ayant utilisé récemment l'intelligence artificielle selon "
+        "l'outil d'intelligence artificielle principalement utilisé"
     ),
     "verification": (
         "Répartition des étudiants inscrits en Sciences de la nature "
-        "selon leur fréquence de vérification des informations "
-        "fournies par l'intelligence artificielle"
+        "ayant utilisé récemment l'intelligence artificielle selon "
+        "leur fréquence de vérification des informations fournies "
+        "par l'intelligence artificielle"
     ),
     "utilite_percue": (
         "Répartition des étudiants inscrits en Sciences de la nature "
-        "selon l'utilité perçue de l'intelligence "
-        "artificielle"
+        "ayant utilisé récemment l'intelligence artificielle selon "
+        "l'utilité perçue de l'intelligence artificielle"
+        
     )
 }
 
-for numero, (variable, tableau) in enumerate(
+for numero, (variable, (tableau, base)) in enumerate(
     tableaux_qualitatifs.items(),
     start=1
 ):
@@ -278,12 +306,12 @@ for numero, (variable, tableau) in enumerate(
     print(tableau)
 
 # Vérification rapide des tableaux créés:
-for variable, tableau in tableaux_qualitatifs.items():
+for variable, (tableau, base) in tableaux_qualitatifs.items():
 
     # On exclut la ligne total avant de vérifier la somme des modalités:
     modalites = tableau.drop(index="Total")
 
-    assert modalites["Effectif"].sum() == len(donnees), (
+    assert modalites["Effectif"].sum() == len(base), (
         f"Erreur dans le tableau : {variable}"
     )
 
