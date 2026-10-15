@@ -475,6 +475,9 @@ minimum_jours = donnees_jours.min()
 maximum_jours = donnees_jours.max()
 etendue_jours = maximum_jours - minimum_jours
 
+# Variance:
+variance_jours = donnees_jours.var(ddof=0)
+
 # Écart-type:
 ecart_type_jours = donnees_jours.std(ddof=0)
 
@@ -484,12 +487,13 @@ coeff_variation_jours = (ecart_type_jours / moyenne_jours) * 100
 # On regroupe les indicateurs dans une seule série pandas:
 indicateurs_jours = pd.Series({
     "Effectif": nb_jours,
-    "Moyenne": moyenne_jours.round,
+    "Moyenne": moyenne_jours,
     "Médiane": mediane_jours,
-    "Mode(s)": ", ".join(map(str, modes_jours)),
+    "Mode": ", ".join(map(str, modes_jours)),
     "Minimum": minimum_jours,
     "Maximum": maximum_jours,
     "Étendue": etendue_jours,
+    "Variance": variance_jours,
     "Écart-type": ecart_type_jours,
     "Coefficient de variation (%)": coeff_variation_jours
 })
@@ -603,15 +607,15 @@ coeff_variation_duree = (
 # On regroupe les indicateurs en série pandas:
 indicateurs_duree = pd.Series({
     "Effectif": nb_total_durees,
-    "Moyenne estimée": moyenne_groupee_duree,
-    "Médiane estimée": mediane_duree,
-    "Mode estimé": mode_duree,
+    "Moyenne": moyenne_groupee_duree,
+    "Médiane": mediane_duree,
+    "Mode": mode_duree,
     "Minimum": duree_min,
     "Maximum": duree_max,
     "Étendue": etendue_duree,
-    "Variance estimée": variance_duree,
-    "Écart-type estimé": ecart_type_duree,
-    "Coefficient de variation estimé (%)": coeff_variation_duree
+    "Variance": variance_duree,
+    "Écart-type": ecart_type_duree,
+    "Coefficient de variation (%)": coeff_variation_duree
 })
 
 # Vérifications 
@@ -627,3 +631,19 @@ assert coeff_variation_duree >= 0
 
 print("\nIndicateurs statistiques de la durée d'utilisation:")
 print(indicateurs_duree)
+
+# Regrouper en un seul tableau
+indicateurs_statistiques = pd.concat(
+    [
+        indicateurs_jours.rename(
+            "Nombre de jours d'utilisation"
+        ),
+        indicateurs_duree.rename(
+            "Durée d'utilisation (minutes)"
+        )
+    ],
+    axis=1
+)
+
+print("\nIndicateurs statistiques des variables quantitatives:")
+print(indicateurs_statistiques)
