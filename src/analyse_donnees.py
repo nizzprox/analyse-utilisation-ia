@@ -133,6 +133,10 @@ assert donnees["utilite_percue"].notna().all()
 # Ensemble de l'échantillon.
 donnees_completes = donnees.copy()
 
+
+# IMPORTANT: donnees_utilisateurs représente le sous-échantillon d'analyse des habitudes d'utilisation.
+# Les valeurs correspondant à un non-utilisateur ne sont donc pas prises en compte.
+
 # Étudiants ayant utilisé l'IA récemment.
 donnees_utilisateurs = donnees.loc[
     donnees["utilisation_recente"] == "Oui"
@@ -144,9 +148,15 @@ print("Nombre d'utilisateurs récents:", len(donnees_utilisateurs))
 ### 6. Tableaux de fréquences des variables qualitatives
 
 # on procède par la création d'une fonction, par respect de la norme DRY (Don't repeat yourself)
-def creer_tableau_frequences(base, variable, cumulatif=False):
+def creer_tableau_frequences(
+    base,
+    variable,
+    cumulatif=False,
+    ordonner_valeurs=False
+):
+
     """
-    Construit un tableau de fréquences pour une variable qualitative
+    Construit un tableau de fréquences pour une variable.
 
     Paramètres
     ----------
@@ -157,7 +167,10 @@ def creer_tableau_frequences(base, variable, cumulatif=False):
     cumulatif: bool
         Ajoute les effectifs et pourcentages cumulés
         lorsque la variable est ordinale.
-    
+    ordonner_valeurs: bool
+        Ordonne les modalités ou valeurs selon leur
+        index avant de construire le tableau.
+
     Retour
     ------
     pandas.DataFrame
@@ -172,6 +185,13 @@ def creer_tableau_frequences(base, variable, cumulatif=False):
             sort=False,
             dropna=False
         )
+    
+    elif ordonner_valeurs:
+        effectifs = serie.value_counts(
+            sort=False,
+            dropna=False
+        ).sort_index()
+    
     else:
         # Pour les variables nominales, classement par effectif décroissant.
         effectifs = serie.value_counts(
@@ -316,3 +336,121 @@ for variable, (tableau, base) in tableaux_qualitatifs.items():
     )
 
 print("\nVérification des tableaux des variables qualitatives ok.")
+
+### 7. Tableaux des variables quantitative
+
+### 7.1. Tableau des jours d'utilisation chez les utilisateurs récents de l'IA
+
+# Création du tableau:
+tableau_jours_utilisation = creer_tableau_frequences(
+    donnees_utilisateurs,
+    "jours_utilisation",
+    cumulatif=True,
+    ordonner_valeurs=True
+)
+
+# Ajout à un dictionnaire sous la forme (tableau, base).
+tableaux_quantitatifs = {
+    "jours_utilisation": (
+        tableau_jours_utilisation,
+        donnees_utilisateurs
+    )
+}
+
+# Ajout du titre du tableau à un dictionnaire pour les titres des tableaux quantitatifs.
+titres_tableaux_quantitatifs = {
+    "jours_utilisation": (
+        "Répartition des étudiants inscrits en Sciences de la nature "
+        "ayant utilisé récemment l'intelligence artificielle selon le "
+        "nombre de jours d'utilisation au cours des 7 derniers jours"
+    )
+}
+
+### 7.2. Tableau de la durée d'utilisation chez les utilisateur récents de l'IA
+
+# Nombre d'observation dans le sous-échantillon d'utilisateurs.
+nb_utilisateurs = len(donnees_utilisateurs)
+print(f"Nombre d'utilisateurs: {nb_utilisateurs}")
+
+# Calcul du nombre de classes selon la règle de Sturges, arrondi vers le haut.
+nb_classes = int(
+    np.ceil(1 + 3.322 * np.log10(nb_utilisateurs))
+)
+print(f"Nombre de classes, selon Sturges: {nb_classes}")
+
+# Calcul de l'étendue
+duree_min = donnees_utilisateurs["duree_minutes"].min() # 16 minutes
+duree_max = donnees_utilisateurs["duree_minutes"].max() # 650 minutes
+
+etendue_duree = duree_max - duree_min   # De 16 à 650 minutes => étendue de 634 minutes.
+print(f"Étendue: {etendue_duree} minutes")
+
+# Calcul de l'amplitude
+amplitude_duree = int(
+    np.ceil(etendue_duree / nb_classes)
+)
+print(f"Amplitude des classes: {amplitude_duree} minutes")
+
+# Construction des classes.
+bornes_duree = [16, 96, 176, 256, 336, 416, 496, 576, 656]
+
+etiquettes_classes_duree = [
+    "[16 ; 96[",
+    "[96 ; 176[",
+    "[176 ; 256[",
+    "[256 ; 336[",
+    "[336 ; 416[",
+    "[416 ; 496[",
+    "[496 ; 576[",
+    "[576 ; 656["
+]
+
+# Regroupement des durées en huit classes de 80 minutes.
+donnees_utilisateurs["classe_duree"] = pd.cut(
+    donnees_utilisateurs["duree_minutes"],
+    bins=bornes_duree,
+    labels=etiquettes_classes_duree,
+    right=False # Classes fermées à gauche et ouvertes à droite.
+)
+
+# Vérification essentielle à faire maintenant:
+# On s'assure de ne pas avoir de classes vides.
+assert donnees_utilisateurs["classe_duree"].notna().all()
+
+# Création du tableau:
+tableau_duree_utilisation = creer_tableau_frequences(
+    donnees_utilisateurs,
+    "classe_duree",
+    cumulatif=True
+)
+
+tableaux_quantitatifs["duree_minutes"] = (
+    tableau_duree_utilisation,
+    donnees_utilisateurs
+)
+
+titres_tableaux_quantitatifs["duree_minutes"] = (
+    "Distribution des étudiants inscrits en Science de la nature "
+    "ayant utilisé récemment l'intelligence artificielle selon la "
+    "durée d'utilisation, en minutes"
+)
+
+# Affichage des tableaux quantitatifs.
+for numero, (variable, (tableau, base)) in enumerate(
+    tableaux_quantitatifs.items(),
+    start=1
+):
+    print("\n" + "=" * 80)
+    print(f"Tableau {numero} : {titres_tableaux_quantitatifs[variable]}")
+    print("=" * 80)
+    print(tableau)
+
+# Vérification rapide des tableaux créés:
+for variable, (tableau, base) in tableaux_quantitatifs.items():
+
+    # On exclut la ligne total avant de vérifier la somme des modalités:
+    modalites = tableau.drop(index="Total")
+
+    assert modalites["Effectif"].sum() == len(base), (
+        f"Erreur dans le tableau : {variable}"
+    )
