@@ -181,7 +181,25 @@ def creer_tableau_frequences(variable, cumulatif=False):
     # Nom de l'index.
     tableau.index.name = "Modalité"
 
-    # Arrondissement uniquement pour la présentation.
+    # Création de la ligne Total.
+    ligne_total = {
+        "Effectif": tableau["Effectif"].sum(),
+        "Fréquence relative" : tableau["Fréquence relative"].sum()
+    }
+
+    if cumulatif:
+        ligne_total["Effectif cumulé"] = tableau["Effectif"].sum()
+        ligne_total["Fréquence cumulée"] = tableau["Fréquence relative"].sum()
+    
+    # Ajout de la ligne Total au tableau.
+    tableau = pd.concat([
+        tableau,
+        pd.DataFrame(
+            [ligne_total],
+            index=["Total"]
+        )
+    ])
+# Arrondissement uniquement pour la présentation.
     tableau["Fréquence relative"] = tableau["Fréquence relative"].round(4)
 
     if cumulatif:
@@ -189,3 +207,84 @@ def creer_tableau_frequences(variable, cumulatif=False):
 
     return tableau
 
+# Variables ordinales: les fréquences cumulées sont pertinentes.
+tableau_session = creer_tableau_frequences(
+    "session",
+    cumulatif=True
+)
+
+tableau_verification = creer_tableau_frequences(
+    "verification",
+    cumulatif=True
+)
+
+tableau_utilite = creer_tableau_frequences(
+    "utilite_percue",
+    cumulatif=True
+)
+
+# Variables nominales: les fréquences cumulées ne sont pas pertinentes.
+tableau_utilisation = creer_tableau_frequences("utilisation_recente")
+tableau_usage = creer_tableau_frequences("usage_principal")
+tableau_outil = creer_tableau_frequences("outil_principal")
+
+# Affichage des résultats:
+tableaux_qualitatifs = {
+    "session": tableau_session,
+    "utilisation_recente": tableau_utilisation,
+    "usage_principal": tableau_usage,
+    "outil_principal": tableau_outil,
+    "verification": tableau_verification,
+    "utilite_percue": tableau_utilite
+}
+
+titres_tableaux_qualitatifs = {
+    "session": (
+        "Répartition des étudiants inscrits en Sciences de la nature "
+        "selon leur session d'études"
+    ),
+    "utilisation_recente": (
+        "Répartition des étudiants inscrits en Sciences de la nature "
+        "selon leur utilisation récente de l'intelligence artificielle"
+    ),
+    "usage_principal": (
+        "Répartition des étudiants inscrits en Sciences de la nature "
+        "selon leur usage principal de l'intelligence artificielle"
+    ),
+    "outil_principal": (
+        "Répartition des étudiants inscrits en Sciences de la nature "
+        "selon l'outil d'intelligence artificielle principalement "
+        "utilisé"
+    ),
+    "verification": (
+        "Répartition des étudiants inscrits en Sciences de la nature "
+        "selon leur fréquence de vérification des informations "
+        "fournies par l'intelligence artificielle"
+    ),
+    "utilite_percue": (
+        "Répartition des étudiants inscrits en Sciences de la nature "
+        "selon l'utilité perçue de l'intelligence "
+        "artificielle"
+    )
+}
+
+for numero, (variable, tableau) in enumerate(
+    tableaux_qualitatifs.items(),
+    start=1
+):
+    print("\n" + "=" * 80)
+    print(f"Tableau {numero}: {titres_tableaux_qualitatifs[variable]}")
+    print("=" * 80)
+    print(tableau)
+
+# Vérification rapide des tableaux créés:
+for variable, tableau in tableaux_qualitatifs.items():
+
+    # On exclut la ligne total avant de vérifier la somme des modalités:
+    modalites = tableau.drop(index="Total")
+
+    assert modalites["Effectif"].sum() == len(donnees), (
+        f"Erreur dans le tableau : {variable}"
+    )
+
+print("\nVérification des tableaux des variables qualitatives ok.")
