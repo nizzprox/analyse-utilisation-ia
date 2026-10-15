@@ -130,3 +130,62 @@ assert donnees["session"].notna().all()
 assert donnees["verification"].notna().all()
 assert donnees["utilite_percue"].notna().all()
 
+### 6. Tableaux de fréquences des variables qualitatives
+
+# on procède par la création d'une fonction, par respect de la norme DRY (Don't repeat yourself)
+def creer_tableau_frequences(variable, cumulatif=False):
+    """
+    Construit un tableau de fréquences pour une variable qualitative
+
+    Paramètres
+    ----------
+    variable: str
+        Nom de la colonne de la base à analyser.
+    cumulatif: bool
+        Ajoute les effectifs et pourcentages cumulés
+        lorsque la variable est ordinale.
+    
+    Retour
+    ------
+    pandas.DataFrame
+        Tableau contenant les effectifs et les fréquences
+    """
+
+    serie = donnees[variable]
+
+    # On veut respecter l'ordre défini pour les variables catégorielles.
+    if isinstance(serie.dtype, pd.CategoricalDtype):
+        effectifs = serie.value_counts(
+            sort=False,
+            dropna=False
+        )
+    else:
+        # Pour les variables nominales, classement par effectif décroissant.
+        effectifs = serie.value_counts(
+            sort=True,
+            dropna=False
+        )
+    
+    total = effectifs.sum()
+
+    tableau = pd.DataFrame({
+        "Effectif": effectifs,
+        "Fréquence relative": effectifs / total
+    })
+
+    # Ajout des fréquences cumulées pour les variables ordinales:
+    if cumulatif:
+        tableau["Effectif cumulé"] = tableau["Effectif"].cumsum()
+        tableau["Fréquence cumulée"] = tableau["Fréquence relative"].cumsum()
+    
+    # Nom de l'index.
+    tableau.index.name = "Modalité"
+
+    # Arrondissement uniquement pour la présentation.
+    tableau["Fréquence relative"] = tableau["Fréquence relative"].round(4)
+
+    if cumulatif:
+        tableau["Fréquence cumulée"] = tableau["Fréquence cumulée"].round(4)
+
+    return tableau
+
