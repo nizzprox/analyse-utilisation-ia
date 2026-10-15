@@ -236,13 +236,13 @@ print(
     ].head(10)
 )
 
-###10. Ajout de la variable usage_principal
+### 10. Ajout de la variable usage_principal
 
 #initialisation du tableau:
 tableau_usages_principaux = np.full(
     N_ÉTUDIANTS,
     "Aucun usage",
-    dtype=object #permet de stocker des chaînes des longueurs différentes
+    dtype=object    # permet de stocker des chaînes des longueurs différentes
 )
 
 #définition des paramètres
@@ -302,3 +302,65 @@ print(
     ].head(10)
 )
 print(donnees["usage_principal"].value_counts())
+
+### 11. Ajout de la variable outil_principal
+
+#étant donné que l'implémentation de cette variable est pratiquement 
+#identique à la variable précédente, les commentaires seront omis.abs
+
+tableau_outil_principal = np.full(
+    N_ÉTUDIANTS,
+    "Aucun outil",
+    dtype=object
+)
+
+outils_possibles = [
+    "ChatGPT",
+    "Gemini",
+    "Copilot",
+    "Perplexity",
+    "Claude",
+    "DeepSeek",
+    "Autre"
+]
+
+probabilites_outils = [0.44, 0.06, 0.10, 0.10, 0.20, 0.05, 0.05]
+
+assert len(outils_possibles) == len(probabilites_outils)
+assert all(0 <= p <= 1 for p in probabilites_outils)
+assert np.isclose(sum(probabilites_outils), 1.0)
+
+outils_generes = rng.choice(
+    a=outils_possibles,
+    size=nb_utilisateurs,
+    replace=True,
+    p=probabilites_outils
+)
+
+tableau_outil_principal[condition_utilisateur] = outils_generes
+
+donnees["outil_principal"] = tableau_outil_principal
+
+assert len(outils_generes) == nb_utilisateurs
+assert len(donnees["outil_principal"]) == N_ÉTUDIANTS
+assert donnees["outil_principal"].notna().all()
+
+assert donnees.loc[
+    condition_utilisateur,
+    "outil_principal"
+].isin(outils_possibles).all()
+
+assert donnees.loc[
+    condition_non_utilisateur,
+    "outil_principal"
+].eq("Aucun outil").all()
+
+print(
+        donnees[
+        [
+            "utilisation_recente",
+            "outil_principal"
+        ]
+    ].head(10)
+)
+print(donnees["outil_principal"].value_counts())
