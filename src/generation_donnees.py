@@ -428,3 +428,64 @@ print(
     ].head(10)
 )
 print(donnees["verification"].value_counts())
+
+### 13. Ajout de la variable utilite_percue
+
+#idem pour les commentaires, ils seront omis.
+
+tableau_utilite_percue = np.full(
+    N_ÉTUDIANTS,
+    "Je n'utilise pas l'IA",
+    dtype=object
+)
+
+assert len(tableau_utilite_percue) == N_ÉTUDIANTS
+
+niveaux_utilite_possibles = [
+    "Pas du tout utile",
+    "Peu utile",
+    "Moyennement utile",
+    "Assez utile",
+    "Très utile"
+]
+
+probabilites_niveau_utilite = [0.05, 0.10, 0.25, 0.38, 0.22]
+
+assert len(niveaux_utilite_possibles) == len(probabilites_niveau_utilite)
+assert np.isclose(sum(probabilites_niveau_utilite), 1.0)
+assert all(0 <= p <= 1 for p in probabilites_niveau_utilite)
+
+utilites_generees = rng.choice(
+    a=niveaux_utilite_possibles,
+    size=nb_utilisateurs,
+    replace=True,
+    p=probabilites_niveau_utilite
+)
+
+tableau_utilite_percue[condition_utilisateur] = utilites_generees
+
+donnees["utilite_percue"] = tableau_utilite_percue
+
+assert len(utilites_generees) == nb_utilisateurs
+assert len(donnees["utilite_percue"]) == N_ÉTUDIANTS
+assert donnees["utilite_percue"].notna().all()
+
+assert donnees.loc[
+    condition_utilisateur,
+    "utilite_percue"
+].isin(niveaux_utilite_possibles).all()
+
+assert donnees.loc[
+    condition_non_utilisateur,
+    "utilite_percue"
+].eq("Je n'utilise pas l'IA").all()
+
+print(
+    donnees[
+        [
+            "utilisation_recente",
+            "utilite_percue"
+        ]
+    ].head(10)
+)
+print(donnees["utilite_percue"].value_counts())
