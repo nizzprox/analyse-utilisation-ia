@@ -306,13 +306,15 @@ print(donnees["usage_principal"].value_counts())
 ### 11. Ajout de la variable outil_principal
 
 #étant donné que l'implémentation de cette variable est pratiquement 
-#identique à la variable précédente, les commentaires seront omis.abs
+#identique à la variable précédente, les commentaires seront omis.
 
 tableau_outil_principal = np.full(
     N_ÉTUDIANTS,
     "Aucun outil",
     dtype=object
 )
+
+assert len(tableau_outil_principal) == N_ÉTUDIANTS
 
 outils_possibles = [
     "ChatGPT",
@@ -364,3 +366,65 @@ print(
     ].head(10)
 )
 print(donnees["outil_principal"].value_counts())
+
+### 12. Ajout de la variable verification
+
+#encore une fois, le code suivra la même structure que pour les
+#deux variables précédentes.
+
+tableau_verification = np.full(
+    N_ÉTUDIANTS,
+    "Je n'utilise pas l'IA",
+    dtype=object
+)
+
+assert len(tableau_verification) == N_ÉTUDIANTS
+
+niveaux_verif_possibles = [
+    "Jamais",
+    "Rarement",
+    "Parfois",
+    "Souvent",
+    "Toujours"
+]
+
+probabilites_niveau_verif = [0.20, 0.15, 0.30, 0.25, 0.10]
+
+assert len(niveaux_verif_possibles) == len(probabilites_niveau_verif)
+assert np.isclose(sum(probabilites_niveau_verif), 1.0)
+assert all(0 <= p <= 1 for p in probabilites_niveau_verif)
+
+niveaux_verif_generes = rng.choice(
+    a=niveaux_verif_possibles,
+    size=nb_utilisateurs,
+    replace=True,
+    p=probabilites_niveau_verif
+)
+
+tableau_verification[condition_utilisateur] = niveaux_verif_generes
+
+donnees["verification"] = tableau_verification
+
+assert len(donnees["verification"]) == N_ÉTUDIANTS
+assert len(niveaux_verif_generes) == nb_utilisateurs
+assert donnees["verification"].notna().all()
+
+assert donnees.loc[
+    condition_utilisateur,
+    "verification"
+].isin(niveaux_verif_possibles).all()
+
+assert donnees.loc[
+    condition_non_utilisateur,
+    "verification"
+].eq("Je n'utilise pas l'IA").all()
+
+print(
+        donnees[
+        [
+            "utilisation_recente",
+            "verification"
+        ]
+    ].head(10)
+)
+print(donnees["verification"].value_counts())
