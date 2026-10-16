@@ -647,3 +647,61 @@ indicateurs_statistiques = pd.concat(
 
 print("\nIndicateurs statistiques des variables quantitatives:")
 print(indicateurs_statistiques)
+
+### 9. Exportation des tableaux en CSV
+
+# Tableaux qualitatifs:
+for variable, (tableau, base) in tableaux_qualitatifs.items():
+
+    tableau.to_csv(
+        DOSSIER_TABLEAUX / f"{variable}.csv",
+        sep=";",
+        encoding="utf-8-sig",
+        float_format="%.4f",
+        index_label="Modalité"
+    )
+
+# Tableaux de distribution quantitative:
+tableau_jours_utilisation.to_csv(
+    DOSSIER_TABLEAUX / "jours_utilisation.csv",
+    sep=";",
+    encoding="utf-8-sig",
+    float_format="%.2f",
+    index_label="Valeur"
+)
+
+tableau_duree_utilisation.to_csv(
+    DOSSIER_TABLEAUX / "duree_utilisation.csv",
+    sep=";",
+    encoding="utf-8-sig",
+    float_format="%.2f",
+    index_label="Valeur"
+)
+
+# Tableau des indicateurs statistiques:
+
+# Copie pour l'export:
+indicateurs_export = indicateurs_statistiques.copy()
+
+# Définition des colonnes numériques à convertir:
+colonnes_num = [
+    "Nombre de jours d'utilisation",
+    "Durée d'utilisation (minutes)"
+]
+
+# Conversion:
+for colonne in colonnes_num:
+    indicateurs_export[colonne] = pd.to_numeric(
+        indicateurs_export[colonne],
+        errors="coerce"
+    ).round(2)
+
+indicateurs_export.to_csv(
+    DOSSIER_TABLEAUX / "indicateurs_statistiques.csv",
+    sep=";",
+    encoding="utf-8-sig",
+    float_format="%.2f",
+    index_label="Indicateur"
+)
+
+print("\nExportation des tableaux en CSV terminée.")
