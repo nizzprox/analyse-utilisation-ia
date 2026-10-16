@@ -1,7 +1,7 @@
 ### 1. Importation des bibliothèques nécessaires
 from pathlib import Path
 
-import matplotlib as plt
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -253,7 +253,11 @@ tableau_session = creer_tableau_frequences(
 tableau_utilisation = creer_tableau_frequences(donnees_completes, "utilisation_recente")  
 
 
-#Tableaux portant uniquement sur les utilisateurs récents:
+# Tableaux portant uniquement sur les utilisateurs récents:
+
+# Petites modifications à faire avant:
+donnees_utilisateurs["verification"] = donnees_utilisateurs["verification"].cat.remove_unused_categories()
+donnees_utilisateurs["utilite_percue"] = donnees_utilisateurs["utilite_percue"].cat.remove_unused_categories()
 
 # Variables ordinales: les fréquences cumulées sont pertinentes.
 tableau_verification = creer_tableau_frequences(
@@ -623,7 +627,7 @@ assert nb_total_durees == len(donnees_utilisateurs)
 
 assert 16 <= moyenne_groupee_duree < 656
 assert 16 <= mediane_duree < 656
-assert 16 <= mode_duree < 96
+assert bornes_duree[0] <= mode_duree < bornes_duree[-1]
 
 assert variance_duree >= 0
 assert ecart_type_duree >= 0
@@ -705,3 +709,278 @@ indicateurs_export.to_csv(
 )
 
 print("\nExportation des tableaux en CSV terminée.")
+
+### 10. Représentations graphiques
+
+# Couleurs qui seront utilisées dans les graphiques:
+COULEUR_BANDES = "#4E79A7"
+COULEUR_HISTOGRAMME = "#F28E2B"
+COULEURS_CIRCULAIRE = ["#4E79A7", "#F28E2B"]
+
+def enregistrer_graphique(nom_fichier):
+    """
+    Ajuste la mise en page, enregistre le graphique au format PNG,
+    affique le graphique puis libère la mémoire.
+    """
+
+    plt.tight_layout()
+
+    plt.savefig(
+        DOSSIER_GRAPHIQUES / nom_fichier,
+        dpi=300,
+        bbox_inches="tight"
+    )
+
+    plt.show()
+    plt.close()
+
+def creer_diagramme_bandes(
+    tableau,
+    titre,
+    nom_fichier,
+    etiquette_axe_x,
+    numero_graphique,
+    horizontal=False
+):
+    """
+    Crée un diagramme à bande à partir d'un tableau de fréquences.
+    """
+
+    titre_complet = f"Graphique {numero_graphique}: {titre}"
+
+    # On ne veut pas afficher la ligne Total dans le graphique
+    donnees_graphique = tableau.drop(index="Total")
+
+    # Identifie les modalités et effectifs
+    modalites = donnees_graphique.index.astype(str)
+    effectifs = donnees_graphique["Effectif"]
+
+    # Initialise le graphique
+    plt.figure(figsize=(10,7))
+
+    if horizontal:  # Si on décide d'afficher le graphique à l'horizontal pour faciliter la lecture des longues modalités
+        plt.barh(
+            modalites,
+            effectifs,
+            color=COULEUR_BANDES,
+            edgecolor="black"
+        )
+
+        plt.xlabel("Effectif")
+        plt.ylabel(etiquette_axe_x)
+        plt.grid(axis="x", alpha=0.25)
+
+        for position, valeur in enumerate(effectifs):
+            plt.text(
+                valeur + 0.3,
+                position,
+                str(valeur),
+                va="center"
+            )
+    else:
+        plt.bar(
+            modalites,
+            effectifs,
+            color=COULEUR_BANDES,
+            edgecolor="black"
+        )
+
+        plt.xlabel(etiquette_axe_x)
+        plt.ylabel("Effectif")
+        plt.grid(axis="y", alpha=0.25)
+        
+        # On fait pivoter les étiquettes de l'axe x de 25 degrés vers la droite,
+        # ce qui aide pour les longues modalités:
+        plt.xticks( 
+            rotation=25,
+            ha="right"
+        )
+
+        for position, valeur in enumerate(effectifs):
+            plt.text(
+                position,
+                valeur + 0.3,
+                str(valeur),
+                ha="center"
+            )
+    
+    plt.subplots_adjust(bottom=0.34)
+
+    # Ajout du titre:
+    plt.figtext(
+        0.5,
+        0.02,
+        titre_complet,
+        ha="center",
+        va="top",
+        wrap=True,
+        fontsize=10
+    )
+
+    # Enregistrement du graphique:
+    enregistrer_graphique(nom_fichier)
+
+def creer_diagramme_circulaire(
+    tableau,
+    titre,
+    nom_fichier,
+    numero_graphique
+):
+    """
+    Crée un diagramme circulaire à partir d'un tableau de fréquences
+    Cette fonction est utilisée pour la variable dichotomique
+    utilisation_recente.
+    """
+
+    titre_complet = f"Graphique {numero_graphique}: {titre}"
+
+    # On ne veut pas ajouter la ligne Total du graphique
+    donnees_graphique = tableau.drop(index="Total")
+
+    # Initialisation du graphique
+    plt.figure(figsize=(8, 7))
+
+    # Création du diagramme circulaire
+    plt.pie(
+        donnees_graphique["Effectif"],
+        labels=donnees_graphique.index.astype(str),
+        autopct="%1.1f %%", # Affiche le pourcentage des modalités avec une décimale
+        startangle=90,
+        colors=COULEURS_CIRCULAIRE,
+        wedgeprops={"edgecolor": "white"} # Ajoute une fine démarcation entre les modalités
+    )
+
+    # Ajoute le titre
+    plt.figtext(
+        0.5,
+        0.03,
+        titre_complet,
+        ha="center",
+        va="bottom",
+        wrap=True,
+        fontsize=10
+    )
+
+    # Enregistre le graphique
+    enregistrer_graphique(nom_fichier)
+
+def creer_histogramme_duree(
+    effectifs,
+    bornes,
+    titre,
+    nom_fichier,
+    numero_graphique
+):
+    """
+    Crée un histogramme de la durée d'utilisation.
+    """
+
+    titre_complet = f"Graphique {numero_graphique}: {titre}"
+
+    largeurs_classes = np.diff(bornes) # Détermine la largeur des classes selon les bornes fournies
+
+    # Initialise le graphique
+    plt.figure(figsize=(11, 6))
+
+    plt.bar(
+        bornes[:-1], # Inclut toutes les bornes sauf la dernière.
+        effectifs, # Donne la hauteur de chaque rectangle.
+        width=largeurs_classes, # Donne la largeur réelle de chaque rectangle (80 min)
+        align="edge",   # Indique que la valeur fournie correspond au bord gauche, et non au centre du rectangle.
+        color=COULEUR_HISTOGRAMME,
+        edgecolor="black"
+    )
+
+    plt.xlabel("Durée totale d'utilisation lors des 7 derniers jours (minutes)")
+    plt.ylabel("Effectif")  # Indique ce que représente la hauteur.
+    plt.xticks(bornes)  # Affiche les bornes sur l'axe horizontal.
+    plt.grid(axis="y", alpha=0.25)
+
+    plt.subplots_adjust(bottom=0.34)
+
+    # Ajout du titre:
+    plt.figtext(
+        0.5,
+        0.02,
+        titre_complet,
+        ha="center",
+        va="top",
+        wrap=True,
+        fontsize=10
+    )
+
+    enregistrer_graphique(nom_fichier)
+
+# Les titres sont communs aux tableaux et aux graphiques:
+titres_graphiques = {
+    **titres_tableaux_qualitatifs,
+    **titres_tableaux_quantitatifs
+}
+
+# Diagrammes en bandes: variables qualitatives et jours d'utilisation:
+creer_diagramme_bandes(
+    tableau_session,
+    titres_graphiques["session"],
+    "session.png",
+    "Session d'études",
+    1
+)
+
+creer_diagramme_bandes(
+    tableau_usage,
+    titres_graphiques["usage_principal"],
+    "usage_principal.png",
+    "Usage principal",
+    2,
+    horizontal=True
+)
+
+creer_diagramme_bandes(
+    tableau_outil,
+    titres_graphiques["outil_principal"],
+    "outil_principal.png",
+    "Outil principal",
+    3,
+    horizontal=True
+)
+
+creer_diagramme_bandes(
+    tableau_verification,
+    titres_graphiques["verification"],
+    "verification.png",
+    "Fréquence de vérification",
+    4
+)
+
+creer_diagramme_bandes(
+    tableau_utilite,
+    titres_graphiques["utilite_percue"],
+    "utilite_percue.png",
+    "Utilité perçue",
+    5
+)
+
+creer_diagramme_bandes(
+    tableau_jours_utilisation,
+    titres_graphiques["jours_utilisation"],
+    "jours_utilisation.png",
+    "Nombre de jours d'utilisation",
+    6
+)
+
+# Diagramme circulaire: variable qualitative nominale (Oui/Non):
+creer_diagramme_circulaire(
+    tableau_utilisation,
+    titres_graphiques["utilisation_recente"],
+    "utilisation_recente.png",
+    7
+)
+
+# Histogramme: durée d'utilisation (en classes):
+creer_histogramme_duree(
+    effectifs_duree,
+    bornes_duree,
+    titres_graphiques["duree_minutes"],
+    "duree_utilisation.png",
+    8
+)
