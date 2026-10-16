@@ -290,16 +290,16 @@ tableaux_qualitatifs = {
 titres_tableaux_qualitatifs = {
     "session": (
         "Répartition des étudiants inscrits en Sciences de la nature "
-        "selon leur session d'études"
+        "selon la session d'études"
     ),
     "utilisation_recente": (
         "Répartition des étudiants inscrits en Sciences de la nature "
-        "selon leur utilisation récente de l'intelligence artificielle"
+        "selon l'utilisation récente de l'intelligence artificielle"
     ),
     "usage_principal": (
         "Répartition des étudiants inscrits en Sciences de la nature "
         "ayant utilisé récemment l'intelligence artificielle selon "
-        "leur usage principal de l'intelligence artificielle"
+        "l'usage principal de l'intelligence artificielle"
     ),
     "outil_principal": (
         "Répartition des étudiants inscrits en Sciences de la nature "
@@ -309,7 +309,7 @@ titres_tableaux_qualitatifs = {
     "verification": (
         "Répartition des étudiants inscrits en Sciences de la nature "
         "ayant utilisé récemment l'intelligence artificielle selon "
-        "leur fréquence de vérification des informations fournies "
+        "la fréquence de vérification des informations fournies "
         "par l'intelligence artificielle"
     ),
     "utilite_percue": (
