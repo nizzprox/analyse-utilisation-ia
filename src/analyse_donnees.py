@@ -931,7 +931,7 @@ creer_diagramme_bandes(
     titres_graphiques["usage_principal"],
     "usage_principal.png",
     "Usage principal",
-    2,
+    5,
     horizontal=True
 )
 
@@ -940,7 +940,7 @@ creer_diagramme_bandes(
     titres_graphiques["outil_principal"],
     "outil_principal.png",
     "Outil principal",
-    3,
+    6,
     horizontal=True
 )
 
@@ -949,7 +949,7 @@ creer_diagramme_bandes(
     titres_graphiques["verification"],
     "verification.png",
     "Fréquence de vérification",
-    4
+    7
 )
 
 creer_diagramme_bandes(
@@ -957,7 +957,7 @@ creer_diagramme_bandes(
     titres_graphiques["utilite_percue"],
     "utilite_percue.png",
     "Utilité perçue",
-    5
+    8
 )
 
 creer_diagramme_bandes(
@@ -965,7 +965,7 @@ creer_diagramme_bandes(
     titres_graphiques["jours_utilisation"],
     "jours_utilisation.png",
     "Nombre de jours d'utilisation",
-    6
+    3
 )
 
 # Diagramme circulaire: variable qualitative nominale (Oui/Non):
@@ -973,7 +973,7 @@ creer_diagramme_circulaire(
     tableau_utilisation,
     titres_graphiques["utilisation_recente"],
     "utilisation_recente.png",
-    7
+    2
 )
 
 # Histogramme: durée d'utilisation (en classes):
@@ -982,5 +982,5 @@ creer_histogramme_duree(
     bornes_duree,
     titres_graphiques["duree_minutes"],
     "duree_utilisation.png",
-    8
+    4
 )
