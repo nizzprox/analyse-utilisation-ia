@@ -1,9 +1,9 @@
-﻿Modalité;Effectif;Fréquence relative
-ChatGPT;32;0.4923
-Claude;11;0.1692
-Perplexity;9;0.1385
-Copilot;5;0.0769
-Gemini;3;0.0462
-DeepSeek;3;0.0462
-Autre;2;0.0308
-Total;65;1.0000
+﻿Modalité,Effectif,Fréquence relative
+ChatGPT,32,0.4923
+Claude,11,0.1692
+Perplexity,9,0.1385
+Copilot,5,0.0769
+Gemini,3,0.0462
+DeepSeek,3,0.0462
+Autre,2,0.0308
+Total,65,1.0000

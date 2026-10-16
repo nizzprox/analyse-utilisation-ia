@@ -1,11 +1,11 @@
-﻿Indicateur;Nombre de jours d'utilisation;Durée d'utilisation (minutes)
-Effectif;65.00;65.00
-Moyenne;3.49;159.38
-Médiane;4.00;121.71
-Mode;4.00;69.33
-Minimum;1.00;16.00
-Maximum;7.00;650.00
-Étendue;6.00;634.00
-Variance;2.56;15896.24
-Écart-type;1.60;126.08
-Coefficient de variation (%);45.79;79.10
+﻿Indicateur,Nombre de jours d'utilisation,Durée d'utilisation (minutes)
+Effectif,65.00,65.00
+Moyenne,3.49,159.38
+Médiane,4.00,121.71
+Mode,4.00,69.33
+Minimum,1.00,16.00
+Maximum,7.00,650.00
+Étendue,6.00,634.00
+Variance,2.56,15896.24
+Écart-type,1.60,126.08
+Coefficient de variation (%),45.79,79.10

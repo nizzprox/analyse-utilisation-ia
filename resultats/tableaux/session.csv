@@ -1,7 +1,7 @@
-﻿Modalité;Effectif;Fréquence relative;Effectif cumulé;Fréquence cumulée
-1re;9;0.1200;9;0.1200
-2e;25;0.3333;34;0.4533
-3e;20;0.2667;54;0.7200
-4e;13;0.1733;67;0.8933
-5e ou plus;8;0.1067;75;1.0000
-Total;75;1.0000;75;1.0000
+﻿Modalité,Effectif,Fréquence relative,Effectif cumulé,Fréquence cumulée
+1re,9,0.1200,9,0.1200
+2e,25,0.3333,34,0.4533
+3e,20,0.2667,54,0.7200
+4e,13,0.1733,67,0.8933
+5e ou plus,8,0.1067,75,1.0000
+Total,75,1.0000,75,1.0000

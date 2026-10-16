@@ -659,7 +659,7 @@ for variable, (tableau, base) in tableaux_qualitatifs.items():
 
     tableau.to_csv(
         DOSSIER_TABLEAUX / f"{variable}.csv",
-        sep=";",
+        sep=",",
         encoding="utf-8-sig",
         float_format="%.4f",
         index_label="Modalité"
@@ -668,7 +668,7 @@ for variable, (tableau, base) in tableaux_qualitatifs.items():
 # Tableaux de distribution quantitative:
 tableau_jours_utilisation.to_csv(
     DOSSIER_TABLEAUX / "jours_utilisation.csv",
-    sep=";",
+    sep=",",
     encoding="utf-8-sig",
     float_format="%.2f",
     index_label="Valeur"
@@ -676,7 +676,7 @@ tableau_jours_utilisation.to_csv(
 
 tableau_duree_utilisation.to_csv(
     DOSSIER_TABLEAUX / "duree_utilisation.csv",
-    sep=";",
+    sep=",",
     encoding="utf-8-sig",
     float_format="%.2f",
     index_label="Valeur"
@@ -702,7 +702,7 @@ for colonne in colonnes_num:
 
 indicateurs_export.to_csv(
     DOSSIER_TABLEAUX / "indicateurs_statistiques.csv",
-    sep=";",
+    sep=",",
     encoding="utf-8-sig",
     float_format="%.2f",
     index_label="Indicateur"

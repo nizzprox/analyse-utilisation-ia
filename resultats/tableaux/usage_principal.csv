@@ -1,9 +1,9 @@
-﻿Modalité;Effectif;Fréquence relative
-Résoudre un problème ou un exercice;14;0.2154
-Comprendre une notion;14;0.2154
-Préparer un examen;11;0.1692
-Résumer;11;0.1692
-Écrire ou comprendre du code;8;0.1231
-Rédiger ou reformuler;6;0.0923
-Autre;1;0.0154
-Total;65;1.0000
+﻿Modalité,Effectif,Fréquence relative
+Résoudre un problème ou un exercice,14,0.2154
+Comprendre une notion,14,0.2154
+Préparer un examen,11,0.1692
+Résumer,11,0.1692
+Écrire ou comprendre du code,8,0.1231
+Rédiger ou reformuler,6,0.0923
+Autre,1,0.0154
+Total,65,1.0000
