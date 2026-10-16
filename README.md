@@ -30,3 +30,8 @@ construites à des fins pédagogiques. La base de données comprendra
 - `resultats/tableaux/` : tableaux statistiques
 - `resultats/graphiques/` : représentations graphiques
 - `rapport/` : documents liés au rapport final
+
+## Exécution
+
+pip install -r requirements.txt
+python src/analyse_donnees.py
